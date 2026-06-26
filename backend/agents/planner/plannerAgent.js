@@ -1,4 +1,10 @@
+const path = require("path");
+
 const BaseAgent = require("../base/BaseAgent");
+
+const fileSystem = require("../../tools/filesystem");
+
+const openAI = require("../../tools/openai/openai");
 
 class PlannerAgent extends BaseAgent {
   constructor() {
@@ -6,16 +12,21 @@ class PlannerAgent extends BaseAgent {
   }
 
   async run(context) {
-    // Log when the planner starts
-    this.log(context, "INFO", "Planner started.");
+    try {
+      this.log(context, "INFO", "Planner started.");
 
-    // Simulate project planning
-    return this.success("Project plan created successfully.", {
-      projectName: "todo-app",
-      framework: "React",
-      language: "JavaScript",
-      styling: "Tailwind CSS",
-    });
+      const systemPrompt = fileSystem.read(
+        path.join(__dirname, "../../tools/openai/prompts/planner.txt"),
+      );
+
+      const result = await openAI.generate(systemPrompt, context.prompt);
+
+      return this.success("Project plan created.", JSON.parse(result));
+    } catch (error) {
+      this.log(context, "ERROR", error.message);
+
+      return this.failure(error);
+    }
   }
 }
 
