@@ -1,10 +1,8 @@
 const path = require("path");
-
 const BaseAgent = require("../base/BaseAgent");
-
 const fileSystem = require("../../tools/filesystem");
-
 const openAI = require("../../tools/openai/openai");
+const validator = require("../../tools/validator/jsonValidator");
 
 class PlannerAgent extends BaseAgent {
   constructor() {
@@ -20,8 +18,8 @@ class PlannerAgent extends BaseAgent {
       );
 
       const result = await openAI.generate(systemPrompt, context.prompt);
-
-      return this.success("Project plan created.", JSON.parse(result));
+      const plan = validator.parse(result);
+      return this.success("Project plan created.", plan);
     } catch (error) {
       this.log(context, "ERROR", error.message);
 

@@ -8,27 +8,22 @@ class OpenAITool {
   }
 
   async generate(systemPrompt, userPrompt) {
-    try {
-      const response = await this.client.responses.create({
-        model: "gpt-5.5",
-        input: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          {
-            role: "user",
-            content: userPrompt,
-          },
-        ],
-      });
+    const response = await this.client.responses.create({
+      model: "gpt-4.1-mini",
 
-      return response.output_text;
-    } catch (error) {
-      console.error("OpenAI Error:", error);
+      input: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+    });
 
-      throw error;
-    }
+    return response.output_text;
   }
 }
 
