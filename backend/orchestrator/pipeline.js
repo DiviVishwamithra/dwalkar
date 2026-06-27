@@ -8,7 +8,8 @@ const assetAgent = require("../agents/asset/assetAgent");
 const validatorAgent = require("../agents/validator/validatorAgent");
 const repairAgent = require("../agents/repair/repairAgent");
 const gitAgent = require("../agents/git/gitAgent");
-const githubAgent = require("../agents/github/githubAgent");
+const repositoryAgent = require("../agents/repository/repositoryAgent");
+// const pullRequestAgent = require("../agents/pullRequest/pullRequestAgent");
 
 class Pipeline {
   constructor() {
@@ -89,9 +90,13 @@ class Pipeline {
           context.git = result.data;
           break;
 
-        case "GitHub":
-          context.github = result.data;
+        case "Repository":
+          context.repository = result.data;
           break;
+
+        // case "PullRequest":
+        //   context.pullRequest = result.data;
+        //   break;
 
         case "Deploy":
           context.deployment = result.data;
@@ -236,14 +241,14 @@ class Pipeline {
     });
 
     // =============================================
-    // GitHub
+    // Repository
     // =============================================
 
-    context.currentAgent = githubAgent.name;
+    context.currentAgent = repositoryAgent.name;
 
-    const githubResult = await githubAgent.run(context);
+    const repositoryResult = await repositoryAgent.run(context);
 
-    if (!githubResult.success) {
+    if (!repositoryResult.success) {
       context.status = "FAILED";
 
       return {
@@ -252,15 +257,42 @@ class Pipeline {
       };
     }
 
-    context.github = githubResult.data;
+    context.repository = repositoryResult.data;
 
     context.execution.push({
-      agent: "GitHub",
-      status: githubResult.status,
+      agent: "Repository",
+      status: repositoryResult.status,
       startedAt: new Date(),
       completedAt: new Date(),
       duration: 0,
     });
+
+    // =============================================
+    // Pull Request
+    // =============================================
+
+    // context.currentAgent = pullRequestAgent.name;
+
+    // const prResult = await pullRequestAgent.run(context);
+
+    // if (!prResult.success) {
+    //   context.status = "FAILED";
+
+    //   return {
+    //     success: false,
+    //     context,
+    //   };
+    // }
+
+    // context.pullRequest = prResult.data;
+
+    // context.execution.push({
+    //   agent: prResult.agent,
+    //   status: prResult.status,
+    //   startedAt: new Date(),
+    //   completedAt: new Date(),
+    //   duration: 0,
+    // });
 
     // =============================================
     // Success

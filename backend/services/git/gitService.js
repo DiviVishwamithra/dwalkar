@@ -33,28 +33,39 @@ class GitService {
 
     console.log("📝 Creating commit...");
 
-    execSync(`git commit -m "${commitMessage}"`, {
-      cwd: projectPath,
-      stdio: "inherit",
-    });
+    try {
+      execSync(`git commit -m "${commitMessage}"`, {
+        cwd: projectPath,
+        stdio: "inherit",
+      });
+    } catch {
+      console.log("ℹ️ Nothing to commit.");
+    }
 
     const branch = execSync("git branch --show-current", {
       cwd: projectPath,
-    })
-      .toString()
-      .trim();
+      encoding: "utf8",
+    }).trim();
 
-    const commit = execSync("git rev-parse --short HEAD", {
-      cwd: projectPath,
-    })
-      .toString()
-      .trim();
+    let commit = "";
+
+    try {
+      commit = execSync("git rev-parse --short HEAD", {
+        cwd: projectPath,
+        encoding: "utf8",
+      }).trim();
+    } catch {}
 
     return {
       initialized: true,
       branch,
       commit,
       message: commitMessage,
+    };
+
+    return {
+      initialized: true,
+      branch,
     };
   }
 }
