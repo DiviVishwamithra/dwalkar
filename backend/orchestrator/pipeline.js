@@ -1,9 +1,24 @@
 const plannerAgent = require("../agents/planner/plannerAgent");
-const codeAgent = require("../agents/coder/codeAgent");
+const buildAgent = require("../agents/builder/builderAgent");
+const packageAgent = require("../agents/package/packageAgent");
+const projectAgent = require("../agents/project/projectAgent");
+const generatorAgent = require("../agents/generator/generatorAgent");
+const themeAgent = require("../agents/theme/themeAgent");
+const assetAgent = require("../agents/asset/assetAgent");
+const validatorAgent = require("../agents/validator/validatorAgent");
 
 class Pipeline {
   constructor() {
-    this.agents = [plannerAgent, codeAgent];
+    this.agents = [
+      plannerAgent,
+      projectAgent,
+      packageAgent,
+      themeAgent,
+      assetAgent,
+      generatorAgent,
+      validatorAgent,
+      buildAgent,
+    ];
   }
 
   async execute(context) {
@@ -36,8 +51,33 @@ class Pipeline {
           context.plan = result.data;
           break;
 
-        case "Code":
+        case "Project":
           context.project = result.data;
+          break;
+
+        case "Package":
+          context.packages = result.data;
+
+          if (context.plan) {
+            context.plan.installedPackages = result.data.packages;
+          }
+
+          break;
+
+        case "Theme":
+          context.theme = result.data;
+          break;
+
+        case "Asset":
+          context.assets = result.data;
+          break;
+
+        case "Validator":
+          context.validation = result.data;
+          break;
+
+        case "Generator":
+          context.generator = result.data;
           break;
 
         case "Build":

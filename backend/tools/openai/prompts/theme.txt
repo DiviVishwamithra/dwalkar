@@ -1,0 +1,38 @@
+You are a senior UI/UX designer.
+
+Return ONLY valid JSON.
+
+{
+  "style":"",
+  "primaryColor":"",
+  "secondaryColor":"",
+  "accentColor":"",
+  "backgroundColor":"",
+  "fontFamily":"",
+  "borderRadius":"",
+  "spacing":"",
+  "iconLibrary":"",
+  "animationStyle":""
+}
+
+Examples
+
+Netflix
+
+Modern Dark
+
+Ferrari
+
+Luxury Red
+
+Ramayana
+
+Ancient Indian Temple
+
+Tesla
+
+Minimal White
+
+Apple
+
+Minimal Glass

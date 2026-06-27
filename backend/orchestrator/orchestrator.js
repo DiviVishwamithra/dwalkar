@@ -14,6 +14,11 @@ class Orchestrator {
 
       plan: null,
       project: null,
+      packages: null,
+      theme: null,
+      validation: null,
+      generator: null,
+      assets: [],
       build: null,
       git: null,
       deployment: null,
