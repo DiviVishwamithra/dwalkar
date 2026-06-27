@@ -29,7 +29,11 @@ export default function Home() {
         try {
             const response = await generateProject(prompt);
 
-            navigate(`/pipeline/${response.jobId}`);
+            navigate(`/pipeline/${response.jobId}`, {
+                state: {
+                    prompt,
+                },
+            });
         } catch (error) {
             console.error(error);
         } finally {

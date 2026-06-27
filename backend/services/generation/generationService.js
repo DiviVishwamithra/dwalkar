@@ -1,15 +1,24 @@
+const { v4: uuid } = require("uuid");
+
 const orchestrator = require("../../orchestrator/orchestrator");
 
 class GenerationService {
   async generate(prompt) {
-    const result = await orchestrator.execute(prompt);
+    const jobId = uuid();
 
+    // Run in background
+    (async () => {
+      try {
+        await orchestrator.execute(prompt, jobId);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+
+    // Return immediately
     return {
-      jobId: result.context.jobId,
-      status: result.context.status,
-      execution: result.context.execution,
-      repository: result.context.repository,
-      deployment: result.context.deployment,
+      jobId,
+      status: "RUNNING",
     };
   }
 }

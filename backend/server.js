@@ -9,8 +9,33 @@ const http = require("http");
 const aiRoutes = require("./routes/ai");
 const generateRoutes = require("./routes/generate");
 
+const { Server } = require("socket.io");
+const socketService = require("./services/socket/socketService");
+
 const app = express();
 const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+socketService.initialize(io);
+
+io.on("connection", (socket) => {
+  console.log("Socket Connected:", socket.id);
+
+  socket.on("join-job", (jobId) => {
+    socket.join(jobId);
+
+    console.log(`Socket joined job ${jobId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected");
+  });
+});
 
 // Middleware
 app.use(cors());

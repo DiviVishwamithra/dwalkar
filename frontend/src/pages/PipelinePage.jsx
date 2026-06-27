@@ -1,9 +1,31 @@
+import { useParams, Navigate } from "react-router-dom";
+
 import Pipeline from "../components/Pipeline";
+import usePipeline from "../hooks/usePipeline";
 
 export default function PipelinePage() {
+    const { jobId } = useParams();
+
+    const {
+        logs,
+        status,
+        result,
+    } = usePipeline(jobId);
+
+    if (status === "COMPLETED") {
+        return (
+            <Navigate
+                to={`/result/${jobId}`}
+                state={result}
+                replace
+            />
+        );
+    }
+
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950">
-            <Pipeline />
-        </main>
+        <Pipeline
+            logs={logs}
+            status={status}
+        />
     );
 }

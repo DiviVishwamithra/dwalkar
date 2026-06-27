@@ -12,6 +12,9 @@ const repositoryAgent = require("../agents/repository/repositoryAgent");
 const vercelAgent = require("../agents/vercel/vercelAgent");
 // const pullRequestAgent = require("../agents/pullRequest/pullRequestAgent");
 
+const jobManager = require("../services/jobs/jobManager");
+const socketService = require("../services/socket/socketService");
+
 class Pipeline {
   constructor() {
     this.agents = [
