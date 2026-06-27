@@ -3,6 +3,7 @@ const fileSystem = require("../../tools/filesystem");
 const openAI = require("../../tools/openai/openai");
 const validator = require("../../tools/validator/jsonValidator");
 const plannerPrompt = require("../../prompts/planner.prompt");
+const MODELS = require("../../config/models");
 
 class PlannerAgent extends BaseAgent {
   constructor() {
@@ -13,7 +14,11 @@ class PlannerAgent extends BaseAgent {
     try {
       this.log(context, "INFO", "Planner started.");
 
-      const result = await openAI.generate(plannerPrompt, context.prompt);
+      const result = await openAI.generate(
+        MODELS.planner,
+        plannerPrompt,
+        context.prompt,
+      );
       const plan = validator.parse(result);
       return this.success("Project plan created.", plan);
     } catch (error) {

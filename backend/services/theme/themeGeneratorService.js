@@ -1,6 +1,7 @@
 const openAI = require("../../tools/openai/openai");
 const themePrompt = require("../../prompts/theme.prompt");
 const parser = require("../../tools/parser/jsonParser");
+const MODELS = require("../../config/models");
 
 class ThemeGeneratorService {
   async generate(plan) {
@@ -18,7 +19,7 @@ Components:
 ${plan.components.join(", ")}
 `;
 
-    const response = await openAI.generate(themePrompt, prompt);
+    const response = await openAI.generate(MODELS.theme, themePrompt, prompt);
 
     console.log("========== THEME RAW RESPONSE ==========");
     console.log(response);

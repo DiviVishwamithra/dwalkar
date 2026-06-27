@@ -22,6 +22,19 @@ class PackageValidator {
     return issues;
   }
 
+  normalizePackage(importName) {
+    if (importName.startsWith(".") || importName.startsWith("/")) {
+      return null;
+    }
+
+    if (importName.startsWith("@")) {
+      const parts = importName.split("/");
+      return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : importName;
+    }
+
+    return importName.split("/")[0];
+  }
+
   scanDirectory(dir, installedPackages, issues) {
     const files = fs.readdirSync(dir);
 
@@ -42,15 +55,13 @@ class PackageValidator {
       const matches = code.matchAll(/import\s+.*?\s+from\s+['"](.+?)['"]/g);
 
       for (const match of matches) {
-        const imported = match[1];
+        const imported = this.normalizePackage(match[1]);
 
-        // Ignore relative imports
-        if (imported.startsWith(".") || imported.startsWith("/")) {
+        if (!imported) {
           continue;
         }
 
-        // Ignore React built-ins
-        if (imported === "react" || imported === "react-dom") {
+        if (imported === "react") {
           continue;
         }
 

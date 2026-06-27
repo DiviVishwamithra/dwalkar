@@ -84,10 +84,28 @@ PAGES
 ${plan.pages.join("\n")}
 
 =========================
-COMPONENTS
+COMPONENT API
 =========================
 
-${plan.components.join("\n")}
+${
+  plan.componentApis?.length
+    ? plan.componentApis
+        .map(
+          (component) => `
+${component.name}
+
+Props:
+${component.props.join(", ")}
+
+Example:
+<${component.name}
+  ${component.props.map((p) => `${p}={...}`).join("\n  ")}
+/>
+`,
+        )
+        .join("\n")
+    : plan.components.join("\n")
+}
 
 =========================
 ASSETS

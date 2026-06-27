@@ -16,9 +16,21 @@ class ValidatorService {
     issues.push(...(await propValidator.validate(context)));
     issues.push(...(await assetValidator.validate(context)));
 
-    issues.forEach((issue) => {
-      console.log(`[Validator] ${issue.type}: ${issue.message}`);
-    });
+    console.log("\n========================================");
+    console.log("🧪 VALIDATION REPORT");
+    console.log("========================================");
+
+    if (!issues.length) {
+      console.log("✅ No validation issues found.");
+    } else {
+      issues.forEach((issue, index) => {
+        console.log(
+          `${index + 1}. ${issue.type}\n   📄 ${issue.file || issue.component || "-"}\n   💬 ${issue.message}\n`,
+        );
+      });
+    }
+
+    console.log("========================================\n");
 
     return {
       passed: issues.length === 0,

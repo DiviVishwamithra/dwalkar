@@ -6,6 +6,7 @@ const generatorAgent = require("../agents/generator/generatorAgent");
 const themeAgent = require("../agents/theme/themeAgent");
 const assetAgent = require("../agents/asset/assetAgent");
 const validatorAgent = require("../agents/validator/validatorAgent");
+const repairAgent = require("../agents/repair/repairAgent");
 
 class Pipeline {
   constructor() {
@@ -16,8 +17,6 @@ class Pipeline {
       themeAgent,
       assetAgent,
       generatorAgent,
-      validatorAgent,
-      buildAgent,
     ];
   }
 
@@ -101,6 +100,111 @@ class Pipeline {
         duration: 0,
       });
     }
+
+    // =============================================
+    // Validation + Repair Loop
+    // =============================================
+
+    const MAX_REPAIR_ATTEMPTS = 3;
+
+    let validationResult;
+
+    for (let attempt = 1; attempt <= MAX_REPAIR_ATTEMPTS; attempt++) {
+      console.log(`\n🧪 Validation Attempt ${attempt}\n`);
+
+      context.currentAgent = validatorAgent.name;
+
+      validationResult = await validatorAgent.run(context);
+
+      if (!validationResult.success) {
+        context.status = "FAILED";
+
+        return {
+          success: false,
+          context,
+        };
+      }
+
+      context.validation = validationResult.data;
+
+      context.execution.push({
+        agent: "Validator",
+        status: validationResult.data.passed ? "PASSED" : "FAILED",
+        startedAt: new Date(),
+        completedAt: new Date(),
+        duration: 0,
+      });
+
+      if (validationResult.data.passed) {
+        console.log("✅ Validation Passed");
+        break;
+      }
+
+      console.log("\n🔧 Running Repair Agent...\n");
+
+      context.currentAgent = repairAgent.name;
+
+      const repairResult = await repairAgent.run(context);
+
+      if (!repairResult.success) {
+        context.status = "FAILED";
+
+        return {
+          success: false,
+          context,
+        };
+      }
+
+      context.execution.push({
+        agent: "Repair",
+        status: repairResult.status,
+        startedAt: new Date(),
+        completedAt: new Date(),
+        duration: 0,
+      });
+
+      if (attempt === MAX_REPAIR_ATTEMPTS) {
+        console.log("❌ Maximum repair attempts reached.");
+
+        context.status = "FAILED";
+
+        return {
+          success: false,
+          context,
+        };
+      }
+    }
+
+    // =============================================
+    // Build
+    // =============================================
+
+    context.currentAgent = buildAgent.name;
+
+    const buildResult = await buildAgent.run(context);
+
+    if (!buildResult.success) {
+      context.status = "FAILED";
+
+      return {
+        success: false,
+        context,
+      };
+    }
+
+    context.build = buildResult.data;
+
+    context.execution.push({
+      agent: "Build",
+      status: buildResult.status,
+      startedAt: new Date(),
+      completedAt: new Date(),
+      duration: 0,
+    });
+
+    // =============================================
+    // Success
+    // =============================================
 
     context.status = "COMPLETED";
 

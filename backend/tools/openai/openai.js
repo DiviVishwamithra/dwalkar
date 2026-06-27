@@ -7,10 +7,11 @@ class OpenAITool {
     });
   }
 
-  async generate(systemPrompt, userPrompt) {
-    const response = await this.client.responses.create({
-      model: "gpt-4.1-mini",
+  async generate(model, systemPrompt, userPrompt) {
+    console.log(`🤖 Model: ${model}`);
 
+    const response = await this.client.responses.create({
+      model,
       input: [
         {
           role: "system",
