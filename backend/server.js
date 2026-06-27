@@ -7,6 +7,7 @@ const cors = require("cors");
 const http = require("http");
 
 const aiRoutes = require("./routes/ai");
+const generateRoutes = require("./routes/generate");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api", aiRoutes);
+app.use("/api/generate", generateRoutes);
 
 // Health Check
 app.get("/", (req, res) => {

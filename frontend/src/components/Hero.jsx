@@ -4,7 +4,14 @@ export default function Hero() {
     return (
         <section className="relative overflow-hidden py-20">
 
-            <div className="absolute left-1/2 top-20 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-blue-600/20 blur-[140px]" />
+            <div className="absolute left-1/2 top-16
+    h-[650px]
+    w-[650px]
+    -translate-x-1/2
+    rounded-full
+    bg-blue-500/15
+    blur-[180px]"
+            />
 
             <div className="relative text-center">
 

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { generateProject } from "../services/generatorService";
 
 import Header from "../components/Header";
 import Hero from "../components/Hero";
@@ -10,6 +12,7 @@ import Examples from "../components/Examples";
 import useSpeechRecognition from "../hooks/useSpeechRecognition";
 
 export default function Home() {
+    const navigate = useNavigate();
     const [prompt, setPrompt] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -18,9 +21,21 @@ export default function Home() {
         startListening,
     } = useSpeechRecognition();
 
-    function handleGenerate() {
-        console.log(prompt);
-    }
+    const handleGenerate = async () => {
+        if (!prompt.trim()) return;
+
+        setLoading(true);
+
+        try {
+            const response = await generateProject(prompt);
+
+            navigate(`/pipeline/${response.jobId}`);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950">

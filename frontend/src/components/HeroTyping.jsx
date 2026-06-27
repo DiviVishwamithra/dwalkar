@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
 const AGENTS = [
-    "🧠 Planner Agent",
-    "⚙️ Generator Agent",
-    "🧪 Validator Agent",
-    "🔧 Repair Agent",
-    "🐙 Repository Agent",
-    "🚀 Vercel Agent",
+    "Planner Agent",
+    "Generator Agent",
+    "Validator Agent",
+    "Repair Agent",
+    "Repository Agent",
+    "Vercel Agent",
 ];
 
 export default function HeroTyping() {
@@ -36,9 +36,13 @@ export default function HeroTyping() {
     }, [index]);
 
     return (
-        <div className="mt-8 h-10 text-2xl font-semibold text-blue-400">
-            {display}
-            <span className="animate-pulse">|</span>
+        <div className="mt-8">
+            <span className="text-blue-400 font-semibold">
+                {display}
+            </span>
+            <span className="animate-pulse text-blue-500">
+                |
+            </span>
         </div>
     );
 }
