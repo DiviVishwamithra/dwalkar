@@ -9,6 +9,7 @@ const validatorAgent = require("../agents/validator/validatorAgent");
 const repairAgent = require("../agents/repair/repairAgent");
 const gitAgent = require("../agents/git/gitAgent");
 const repositoryAgent = require("../agents/repository/repositoryAgent");
+const vercelAgent = require("../agents/vercel/vercelAgent");
 // const pullRequestAgent = require("../agents/pullRequest/pullRequestAgent");
 
 class Pipeline {
@@ -99,7 +100,7 @@ class Pipeline {
         //   break;
 
         case "Deploy":
-          context.deployment = result.data;
+          context.hosting = result.data;
           break;
       }
 
@@ -262,6 +263,33 @@ class Pipeline {
     context.execution.push({
       agent: "Repository",
       status: repositoryResult.status,
+      startedAt: new Date(),
+      completedAt: new Date(),
+      duration: 0,
+    });
+
+    // =============================================
+    // Vercel Agent
+    // =============================================
+
+    context.currentAgent = vercelAgent.name;
+
+    const vercelResult = await vercelAgent.run(context);
+
+    if (!vercelResult.success) {
+      context.status = "FAILED";
+
+      return {
+        success: false,
+        context,
+      };
+    }
+
+    context.hosting = vercelResult.data;
+
+    context.execution.push({
+      agent: "Vercel",
+      status: vercelResult.status,
       startedAt: new Date(),
       completedAt: new Date(),
       duration: 0,

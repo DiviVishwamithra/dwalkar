@@ -4,6 +4,7 @@ const routeValidator = require("./validators/routeValidator");
 const importValidator = require("./validators/importValidator");
 const propValidator = require("./validators/propValidator");
 const assetValidator = require("./validators/assetValidator");
+const tailwindValidator = require("../../tools/validator/tailwindValidator");
 
 class ValidatorService {
   async validate(context) {
@@ -15,6 +16,9 @@ class ValidatorService {
     issues.push(...(await routeValidator.validate(context)));
     issues.push(...(await propValidator.validate(context)));
     issues.push(...(await assetValidator.validate(context)));
+    issues.push(
+      ...(await tailwindValidator.validate(context.project.projectPath)),
+    );
 
     console.log("\n========================================");
     console.log("🧪 VALIDATION REPORT");
