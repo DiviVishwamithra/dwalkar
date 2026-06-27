@@ -23,12 +23,20 @@ class RepairAgent extends BaseAgent {
         });
       }
 
+      const repairedFiles = [];
+
       for (const issue of issues) {
-        await repairService.repair(issue);
+        const result = await repairService.repair(
+          context.project.projectPath,
+          issue,
+        );
+
+        repairedFiles.push(result.file);
       }
 
       return this.success("Repair completed.", {
-        repaired: issues.length,
+        repaired: repairedFiles.length,
+        repairedFiles,
       });
     } catch (error) {
       this.log(context, "ERROR", error.message);

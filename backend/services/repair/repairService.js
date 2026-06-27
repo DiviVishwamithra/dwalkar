@@ -3,31 +3,60 @@ const openAI = require("../../tools/openai/openai");
 const cleaner = require("../ai/codeCleaner");
 const repairPrompt = require("../../prompts/repair/repair.prompt");
 const MODELS = require("../../config/models");
+const path = require("path");
 
 class RepairService {
-  async repair(issue) {
+  async repair(projectPath, issue) {
     console.log(`🔧 Repairing: ${issue.file}`);
 
-    const code = fs.readFileSync(issue.file, "utf8");
+    const absoluteFilePath = path.join(projectPath, issue.file);
+
+    if (!fs.existsSync(absoluteFilePath)) {
+      throw new Error(`Repair failed. File does not exist: ${issue.file}`);
+    }
+
+    const code = fs.readFileSync(absoluteFilePath, "utf8");
 
     const prompt = `
+PROJECT
+
+${path.basename(projectPath)}
+
+=====================================
+
 FILE
 
 ${issue.file}
+
+=====================================
 
 ISSUE TYPE
 
 ${issue.type}
 
+=====================================
+
 ISSUE
 
 ${issue.message}
 
-CURRENT CODE
+=====================================
+
+AVAILABLE FILES
+
+${fs.readdirSync(path.join(projectPath, "src", "pages")).join("\n")}
+
+=====================================
+
+CURRENT FILE
 
 ${code}
 
-Fix ONLY this issue.
+=====================================
+
+Fix ONLY the reported issue.
+
+Do NOT modify unrelated code.
 
 Return ONLY the corrected file.
 `;
@@ -36,7 +65,7 @@ Return ONLY the corrected file.
 
     const repairedCode = cleaner.clean(response);
 
-    fs.writeFileSync(issue.file, repairedCode);
+    fs.writeFileSync(absoluteFilePath, repairedCode);
 
     return {
       repaired: true,

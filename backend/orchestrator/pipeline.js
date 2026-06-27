@@ -7,6 +7,8 @@ const themeAgent = require("../agents/theme/themeAgent");
 const assetAgent = require("../agents/asset/assetAgent");
 const validatorAgent = require("../agents/validator/validatorAgent");
 const repairAgent = require("../agents/repair/repairAgent");
+const gitAgent = require("../agents/git/gitAgent");
+const githubAgent = require("../agents/github/githubAgent");
 
 class Pipeline {
   constructor() {
@@ -85,6 +87,10 @@ class Pipeline {
 
         case "Git":
           context.git = result.data;
+          break;
+
+        case "GitHub":
+          context.github = result.data;
           break;
 
         case "Deploy":
@@ -197,6 +203,60 @@ class Pipeline {
     context.execution.push({
       agent: "Build",
       status: buildResult.status,
+      startedAt: new Date(),
+      completedAt: new Date(),
+      duration: 0,
+    });
+
+    // =============================================
+    // Git
+    // =============================================
+
+    context.currentAgent = gitAgent.name;
+
+    const gitResult = await gitAgent.run(context);
+
+    if (!gitResult.success) {
+      context.status = "FAILED";
+
+      return {
+        success: false,
+        context,
+      };
+    }
+
+    context.git = gitResult.data;
+
+    context.execution.push({
+      agent: "Git",
+      status: gitResult.status,
+      startedAt: new Date(),
+      completedAt: new Date(),
+      duration: 0,
+    });
+
+    // =============================================
+    // GitHub
+    // =============================================
+
+    context.currentAgent = githubAgent.name;
+
+    const githubResult = await githubAgent.run(context);
+
+    if (!githubResult.success) {
+      context.status = "FAILED";
+
+      return {
+        success: false,
+        context,
+      };
+    }
+
+    context.github = githubResult.data;
+
+    context.execution.push({
+      agent: "GitHub",
+      status: githubResult.status,
       startedAt: new Date(),
       completedAt: new Date(),
       duration: 0,
